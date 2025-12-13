@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.16.0)
 project(tds-control VERSION 0.0.1 LANGUAGES C CXX)
-
-include(CTest)
+include(FetchContent)
 
 set(TDS_CONTROL_HEADERS
         include/tdscontrol/tds.hpp
@@ -14,7 +13,19 @@ set(TDS_CONTROL_SRC
 set(TDS_CONTROL_TEST
             tests/test_roots.cpp)
 
-find_package(Eigen3 REQUIRED NO_MODULE)
+find_package(Eigen3 QUIET NO_MODULE)
+if(NOT Eigen3_FOUND)
+  message(STATUS "Eigen not found, fetching with FetchContent")
+
+  FetchContent_Declare(
+    eigen
+    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+    GIT_TAG 3.4.0   
+  )
+
+  FetchContent_MakeAvailable(eigen)
+
+endif()
 
 add_library(tdscontrol STATIC ${TDS_CONTROL_HEADERS} ${TDS_CONTROL_SRC})
 set_property(TARGET tdscontrol PROPERTY POSITION_INDEPENDENT_CODE ON)
@@ -46,6 +57,7 @@ endif()
 
 if (BUILD_TESTING)
     message(STATUS "Build tests")
+    include(CTest)
     enable_testing()
     find_package(GTest REQUIRED)
 

@@ -21,3 +21,4 @@ wheel.packages = ["pytdscontrol"]
 
 [tool.scikit-build.cmake.define]
 PYTHON_BINDINGS = "ON"
+BUILD_TESTING = "OFF"
