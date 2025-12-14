@@ -51,8 +51,9 @@ if (PYTHON_BINDINGS)
 
     # Install the compiled extension into the package dir inside the wheel
     install(TARGETS pytdscontrol
-            LIBRARY DESTINATION "pytdscontrol"    # Unix .so
-            RUNTIME DESTINATION "pytdscontrol")   # Windows .pyd/.dll
+            LIBRARY DESTINATION "tdscontrol"    # Unix .so
+            RUNTIME DESTINATION "tdscontrol")   # Windows .pyd/.dll
+    install()
 endif()
 
 if (BUILD_TESTING)
