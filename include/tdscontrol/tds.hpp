@@ -1,5 +1,8 @@
 #pragma once
 #include <vector>
+#ifdef JULIA_BINDING
+#include "jlcxx/jlcxx.hpp"
+#endif
 
 namespace tds
 {
@@ -9,6 +12,9 @@ namespace tds
             std::vector<double> m_hA;
         public:
             tds(std::vector<double> A, std::vector<double> hA);
+            #ifdef JULIA_BINDING
+            tds(jlcxx::ArrayRef<double> A, jlcxx::ArrayRef<double> hA);
+            #endif
 
             const std::vector<double> &A() const; 
             

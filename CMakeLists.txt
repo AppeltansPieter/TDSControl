@@ -32,8 +32,10 @@ set_property(TARGET tdscontrol PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_include_directories(tdscontrol PUBLIC include)
 target_link_libraries(tdscontrol PRIVATE Eigen3::Eigen)
 
-add_executable(demo examples/demo.cpp)
-target_link_libraries(demo tdscontrol)
+if (BUILD_EXAMPLE)
+    add_executable(demo examples/demo.cpp)
+    target_link_libraries(demo tdscontrol)
+endif()
 
 if (PYTHON_BINDINGS)
     set(TDS_CONTROL_PY_BINDINGS
@@ -62,14 +64,13 @@ if (JULIA_BINDINGS)
   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location}")
 
   message(STATUS "Found JlCxx at ${JlCxx_location}")
-  set_target_properties(JlCxx::cxxwrap_julia PROPERTIES INTERFACE_COMPILE_FEATURES "")
-  set(CMAKE_CXX_STANDARD 17)
+
 
   target_compile_definitions(tdscontrol PUBLIC JULIA_BINDING)
-  target_link_libraries(tdscontrol PUBLIC JlCxx::cxxwrap_julia)
+  target_link_libraries(tdscontrol PUBLIC JlCxx::cxxwrap_julia JlCxx::cxxwrap_julia_stl)
 
   add_library(tdscontroljl SHARED julia/bindings.cpp)
-  target_link_libraries(tdscontroljl PUBLIC JlCxx::cxxwrap_julia tdscontrol)
+  target_link_libraries(tdscontroljl PUBLIC tdscontrol JlCxx::cxxwrap_julia JlCxx::cxxwrap_julia_stl)
 
   install(TARGETS tdscontroljl 
           LIBRARY DESTINATION lib
