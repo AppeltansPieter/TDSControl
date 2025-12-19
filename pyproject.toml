@@ -28,6 +28,7 @@ BUILD_TESTING = "OFF"
 provider = "scikit_build_core.metadata.regex"
 input = "VERSION"
 
+# Generate 
 [[tool.scikit-build.generate]]
 location = "install"
 path = "tdscontrol/version.py"

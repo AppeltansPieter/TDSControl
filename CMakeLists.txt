@@ -37,7 +37,7 @@ target_link_libraries(demo tdscontrol)
 
 if (PYTHON_BINDINGS)
     set(TDS_CONTROL_PY_BINDINGS
-            src/py_bindings.cpp)
+            python/py_bindings.cpp)
 
     # Add Python extension build using nanobind
     find_package(Python 3.9 REQUIRED COMPONENTS Interpreter Development.Module REQUIRED)
@@ -47,7 +47,7 @@ if (PYTHON_BINDINGS)
     find_package(nanobind CONFIG REQUIRED)
 
     nanobind_add_module(pytdscontrol MODULE ${TDS_CONTROL_PY_BINDINGS})
-    target_link_libraries(pytdscontrol PUBLIC tdscontrol)
+    target_link_libraries(pytdscontrol PRIVATE tdscontrol)
 
     # Install the compiled extension into the package dir inside the wheel
     install(TARGETS pytdscontrol
