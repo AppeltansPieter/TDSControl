@@ -53,7 +53,74 @@ if (PYTHON_BINDINGS)
     install(TARGETS pytdscontrol
             LIBRARY DESTINATION "tdscontrol"    # Unix .so
             RUNTIME DESTINATION "tdscontrol")   # Windows .pyd/.dll
-    install()
+endif()
+
+if (JULIA_BINDINGS)
+  find_package(JlCxx)
+  get_target_property(JlCxx_location JlCxx::cxxwrap_julia LOCATION)
+  get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location}")
+
+  message(STATUS "Found JlCxx at ${JlCxx_location}")
+  set_target_properties(JlCxx::cxxwrap_julia PROPERTIES INTERFACE_COMPILE_FEATURES "")
+  set(CMAKE_CXX_STANDARD 17)
+
+  target_compile_definitions(tdscontrol PUBLIC JULIA_BINDING)
+  target_link_libraries(tdscontrol PUBLIC JlCxx::cxxwrap_julia)
+
+  add_library(tdscontroljl SHARED julia/bindings.cpp)
+  target_link_libraries(tdscontroljl PUBLIC JlCxx::cxxwrap_julia tdscontrol)
+
+  install(TARGETS tdscontroljl 
+          LIBRARY DESTINATION lib
+          ARCHIVE DESTINATION lib
+          RUNTIME DESTINATION lib)
+endif()
+
+if (OCTAVE_BINDINGS)
+    find_program(MKOCTFILE_EXECUTABLE mkoctfile)
+
+    if(NOT MKOCTFILE_EXECUTABLE)
+        message(FATAL_ERROR "mkoctfile not found")
+    endif()
+
+    get_target_property(TDSCONTROL_INCLUDES
+        tdscontrol
+        INTERFACE_INCLUDE_DIRECTORIES
+    )
+
+    if(TDSCONTROL_INCLUDES)
+        list(TRANSFORM TDSCONTROL_INCLUDES PREPEND "-I")
+    endif()
+
+    add_custom_command(
+        OUTPUT tds_create.oct
+        COMMAND ${MKOCTFILE_EXECUTABLE}
+                -std=c++17
+                ${TDSCONTROL_INCLUDES}
+                ${CMAKE_CURRENT_SOURCE_DIR}/octave/tds_create.cpp
+                $<TARGET_FILE:tdscontrol>
+                -o tds_create.oct
+        DEPENDS tdscontrol octave/tds_create.cpp
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+    add_custom_command(
+        OUTPUT tds_roots.oct
+        COMMAND ${MKOCTFILE_EXECUTABLE}
+                -std=c++17
+                ${TDSCONTROL_INCLUDES}
+                ${CMAKE_CURRENT_SOURCE_DIR}/octave/tds_roots.cpp
+                $<TARGET_FILE:tdscontrol>
+                -o tds_roots.oct
+        DEPENDS tdscontrol ${CMAKE_CURRENT_SOURCE_DIR}/octave/tds_roots.cpp
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+    add_custom_target(octave_bindings ALL
+        DEPENDS tds_roots.oct tds_create.oct
+    )
+    #TODO: find octave location and install in packages!
 endif()
 
 if (BUILD_TESTING)

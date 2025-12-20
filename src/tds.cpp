@@ -6,7 +6,7 @@ namespace tds
     tds::tds(std::vector<double> A, std::vector<double> hA) 
     : m_A(A), m_hA(hA)
     {
-        TDS_CONTROL_PRECONDITION(A.size() == m_hA.size(), "Number of elements in A and hA do not match!");
+        TDS_CONTROL_PRECONDITION(m_A.size() == m_hA.size(), "Number of elements in A and hA do not match!");
     }
 
     const std::vector<double> &tds::A() const {
