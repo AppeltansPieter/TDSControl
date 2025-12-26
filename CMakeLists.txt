@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.16.0)
-project(tds-control VERSION 0.0.1 LANGUAGES C CXX)
+
+file(READ "${CMAKE_SOURCE_DIR}/VERSION" VERSION_CONTENTS) 
+string(REGEX MATCH "VERSION = \"([0-9]+\.[0-9]+\.[0-9])\"" _ ${VERSION_CONTENTS})
+set(PROJECT_VERSION "${CMAKE_MATCH_1}")
+
+project(tds-control VERSION ${PROJECT_VERSION} LANGUAGES C CXX)
 include(FetchContent)
 
 set(TDS_CONTROL_HEADERS
@@ -35,25 +40,6 @@ target_link_libraries(tdscontrol PRIVATE Eigen3::Eigen)
 add_executable(demo examples/demo.cpp)
 target_link_libraries(demo tdscontrol)
 
-if (PYTHON_BINDINGS)
-    set(TDS_CONTROL_PY_BINDINGS
-            python/py_bindings.cpp)
-
-    # Add Python extension build using nanobind
-    find_package(Python 3.9 REQUIRED COMPONENTS Interpreter Development.Module REQUIRED)
-    execute_process(
-        COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
-        OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
-    find_package(nanobind CONFIG REQUIRED)
-
-    nanobind_add_module(pytdscontrol MODULE ${TDS_CONTROL_PY_BINDINGS})
-    target_link_libraries(pytdscontrol PRIVATE tdscontrol)
-
-    # Install the compiled extension into the package dir inside the wheel
-    install(TARGETS pytdscontrol
-            LIBRARY DESTINATION "tdscontrol"    # Unix .so
-            RUNTIME DESTINATION "tdscontrol")   # Windows .pyd/.dll
-endif()
 
 if (JULIA_BINDINGS)
   find_package(JlCxx)
@@ -75,52 +61,6 @@ if (JULIA_BINDINGS)
           LIBRARY DESTINATION lib
           ARCHIVE DESTINATION lib
           RUNTIME DESTINATION lib)
-endif()
-
-if (OCTAVE_BINDINGS)
-    find_program(MKOCTFILE_EXECUTABLE mkoctfile)
-
-    if(NOT MKOCTFILE_EXECUTABLE)
-        message(FATAL_ERROR "mkoctfile not found")
-    endif()
-
-    get_target_property(TDSCONTROL_INCLUDES
-        tdscontrol
-        INTERFACE_INCLUDE_DIRECTORIES
-    )
-
-    if(TDSCONTROL_INCLUDES)
-        list(TRANSFORM TDSCONTROL_INCLUDES PREPEND "-I")
-    endif()
-
-    add_custom_command(
-        OUTPUT tds_create.oct
-        COMMAND ${MKOCTFILE_EXECUTABLE}
-                -std=c++17
-                ${TDSCONTROL_INCLUDES}
-                ${CMAKE_CURRENT_SOURCE_DIR}/octave/tds_create.cpp
-                $<TARGET_FILE:tdscontrol>
-                -o tds_create.oct
-        DEPENDS tdscontrol octave/tds_create.cpp
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-
-    add_custom_command(
-        OUTPUT tds_roots.oct
-        COMMAND ${MKOCTFILE_EXECUTABLE}
-                -std=c++17
-                ${TDSCONTROL_INCLUDES}
-                ${CMAKE_CURRENT_SOURCE_DIR}/octave/tds_roots.cpp
-                $<TARGET_FILE:tdscontrol>
-                -o tds_roots.oct
-        DEPENDS tdscontrol ${CMAKE_CURRENT_SOURCE_DIR}/octave/tds_roots.cpp
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-
-    add_custom_target(octave_bindings ALL
-        DEPENDS tds_roots.oct tds_create.oct
-    )
-    #TODO: find octave location and install in packages!
 endif()
 
 if (BUILD_TESTING)
