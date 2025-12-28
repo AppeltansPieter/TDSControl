@@ -1,7 +1,12 @@
 name: Clang Format Check
+permissions:
+  contents: read
+  pull-requests: write
 
 on:
   pull_request:
+    branches: [ main ]
+  push:
     branches: [ main ]
 
 jobs:
@@ -9,6 +14,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Install Eigen3
+        uses: kupns-aka-kupa/setup-eigen3@v1
+        with:
+          version: 3.4.0
+      - name: Configure
+        run: |
+          sudo apt-get install -y ninja-build libgtest-dev libgmock-dev
+          cmake --preset ci
       - uses: cpp-linter/cpp-linter-action@v2
         id: linter
         env:
@@ -17,16 +30,13 @@ jobs:
           style: 'file'  # Use .clang-format config file
           tidy-checks: '' # Use .clang-tidy config file
           # only 'update' a single comment in a pull request thread.
+          database: "${{ github.workspace }}/build/ci"
           thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
       - name: Fail fast?!
         if: steps.linter.outputs.checks-failed > 0
         run: exit 1
-      - name: Configure
-        run: |
-          sudo apt-get install -y ninja-build
-          cmake --preset ci
       - name: Build
         run:
           cmake --build --preset build-ci
       - name: Run tests
-        run: ctest --preset test-debug
+        run: ctest --preset test-ci
