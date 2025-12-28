@@ -1,0 +1,18 @@
+Checks: >
+  clang-analyzer-*,
+  modernize-*,
+  -modernize-use-nodiscard,
+  -modernize-use-trailing-return-type,
+  performance-*,
+  readability-*,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  bugprone-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-macro-usage
+
+WarningsAsErrors: '*'
+
+HeaderFilterRegex: '.*'
+FormatStyle:     none

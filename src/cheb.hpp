@@ -2,10 +2,10 @@
 
 #include <cmath>
 
-namespace tds
+namespace tds {
+inline double cheb(const double x, const std::size_t N)
 {
-   inline double cheb(const double x, const std::size_t N){
-        // Faster using polynomial and more accurate.
-        return std::cos(N * std::acos(x));
-   } 
+    // Faster using polynomial and more accurate.
+    return std::cos(static_cast<double>(N) * std::acos(x));
+}
 } // namespace tds

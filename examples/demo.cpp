@@ -1,7 +1,7 @@
-#include <iostream>
-#include <tdscontrol/tds.hpp>
-#include <tdscontrol/roots.hpp>
 #include <iomanip>
+#include <iostream>
+#include <tdscontrol/roots.hpp>
+#include <tdscontrol/tds.hpp>
 
 int main(int argc, char const *argv[])
 {
@@ -9,11 +9,10 @@ int main(int argc, char const *argv[])
     const auto roots = tds::roots(sys, 15);
     std::cout << "Eigenvalues: ";
     std::cout << std::fixed << std::setprecision(16);
-    for (auto &root: roots)
-    {
+    for (const auto &root : roots) {
         std::cout << root << ", ";
     }
     std::cout << "\n";
-    
+
     return 0;
 }
