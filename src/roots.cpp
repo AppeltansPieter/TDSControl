@@ -8,25 +8,23 @@
 
 namespace tds {
 
-std::vector<std::complex<double>> roots(const tds &sys, unsigned int N)
+std::vector<std::complex<double>> roots(const tds &system, const unsigned int N)
 {
-    Eigen::MatrixXd Sigma;
-    Eigen::MatrixXd Pi;
     Eigen::GeneralizedEigenSolver<Eigen::MatrixXd> ges;
 
-    const double tau_m = *std::max_element(sys.hA().cbegin(), sys.hA().cend());
+    const double tau_m = *std::max_element(system.hA().cbegin(), system.hA().cend());
     // Set-up Sigma
-    Sigma = Eigen::MatrixXd::Identity(N + 1, N + 1);
+    Eigen::MatrixXd Sigma = Eigen::MatrixXd::Identity(N + 1, N + 1);
     for (Eigen::Index i = 0; i <= N; i++) {
         double Ri = 0;
-        for (std::size_t k = 0; k < sys.mA(); k++) {
-            Ri += sys.A()[k] * cheb(-2.0 * sys.hA()[k] / tau_m + 1.0, i);
+        for (std::size_t k = 0; k < system.mA(); k++) {
+            Ri += system.A()[k] * cheb(-2.0 * system.hA()[k] / tau_m + 1.0, i);
         }
         Sigma(0, i) = Ri;
     }
 
     // Set-up Pi
-    Pi = Eigen::MatrixXd::Zero(N + 1, N + 1);
+    Eigen::MatrixXd Pi = Eigen::MatrixXd::Zero(N + 1, N + 1);
     Pi.row(0) = 4.0 / tau_m * Eigen::MatrixXd::Ones(1, N + 1);
     for (Eigen::Index i = 1; i <= N; i++) {
         Pi(i, i - 1) = 1.0 / static_cast<double>(i);

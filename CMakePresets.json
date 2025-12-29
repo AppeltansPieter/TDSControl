@@ -24,7 +24,7 @@
       "displayName": "Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "BUILD_TESTING": "ON"
+        "TDS_BUILD_TESTING": "ON"
       }
     },
     {

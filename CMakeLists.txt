@@ -24,6 +24,9 @@ find_package(Eigen3 QUIET NO_MODULE)
 if(NOT Eigen3_FOUND)
   message(STATUS "Eigen not found, fetching with FetchContent")
 
+  set(EIGEN_BUILD_TESTS
+      OFF
+      CACHE BOOL "" FORCE)
   FetchContent_Declare(
     eigen
     GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
@@ -43,7 +46,7 @@ if(BUILD_EXAMPLES)
   target_link_libraries(demo tdscontrol)
 endif()
 
-if(BUILD_TESTING)
+if(TDS_BUILD_TESTING)
   message(STATUS "Build tests")
   include(CTest)
   include(Sanitizers)
