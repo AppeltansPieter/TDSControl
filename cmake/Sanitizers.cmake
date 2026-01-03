@@ -4,7 +4,7 @@ function(enable_sanitizers target)
             -fsanitize=address,undefined
             -fno-omit-frame-pointer
         )
-        target_link_options(${target} PRIVATE
+        target_link_options(${target} PUBLIC
             -fsanitize=address,undefined
         )
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")

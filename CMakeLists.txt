@@ -14,11 +14,10 @@ project(
 
 include(FetchContent)
 
-set(TDS_CONTROL_HEADERS include/tdscontrol/tds.hpp include/tdscontrol/roots.hpp)
+set(TDS_CONTROL_HEADERS include/tdscontrol/tds.hpp include/tdscontrol/roots.hpp
+                        src/discretization/spectral.hpp)
 
-set(TDS_CONTROL_SRC src/tds.cpp src/roots.cpp)
-
-set(TDS_CONTROL_TEST tests/test_roots.cpp)
+set(TDS_CONTROL_SRC src/tds.cpp src/roots.cpp src/discretization/spectral.cpp)
 
 find_package(Eigen3 QUIET NO_MODULE)
 if(NOT Eigen3_FOUND)
@@ -39,7 +38,7 @@ endif()
 add_library(tdscontrol STATIC ${TDS_CONTROL_HEADERS} ${TDS_CONTROL_SRC})
 set_property(TARGET tdscontrol PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_include_directories(tdscontrol PUBLIC include)
-target_link_libraries(tdscontrol PRIVATE Eigen3::Eigen)
+target_link_libraries(tdscontrol PUBLIC Eigen3::Eigen)
 
 if(BUILD_EXAMPLES)
   add_executable(demo examples/demo.cpp)
@@ -51,19 +50,18 @@ if(TDS_BUILD_TESTING)
   include(CTest)
   include(Sanitizers)
   include(Warnings)
+  include(AddTest)
 
   enable_testing()
   find_package(GTest REQUIRED)
 
-  add_executable(test_tds ${TDS_CONTROL_TEST})
-  target_link_libraries(test_tds PRIVATE GTest::gtest_main GTest::gmock
-                                         tdscontrol)
-  enable_sanitizers(test_tds)
   enable_sanitizers(tdscontrol)
-
-  enable_warnings(test_tds)
   enable_warnings(tdscontrol)
-  add_test(NAME test_tds COMMAND test_tds)
+  target_compile_definitions(tdscontrol PUBLIC TDS_TESTING)
+
+  add_tdscontrol_test(test_roots "tests/test_roots.cpp")
+  add_tdscontrol_test(test_sparse_spectral_discretization
+                      "tests/sparse_spectral_discretization.cpp")
 endif()
 
 find_program(CLANG_FORMAT clang-format)
