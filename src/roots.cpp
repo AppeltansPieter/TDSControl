@@ -1,8 +1,7 @@
-#include "cheb.hpp"
+#include "discretization/spectral.hpp"
 
-#include <Eigen/Core>
+#include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
-#include <algorithm>
 #include <tdscontrol/roots.hpp>
 #include <tdscontrol/tds.hpp>
 
@@ -12,28 +11,7 @@ std::vector<std::complex<double>> roots(const tds &system, const unsigned int N)
 {
     Eigen::GeneralizedEigenSolver<Eigen::MatrixXd> ges;
 
-    const double tau_m = *std::max_element(system.hA().cbegin(), system.hA().cend());
-    // Set-up Sigma
-    Eigen::MatrixXd Sigma = Eigen::MatrixXd::Identity(N + 1, N + 1);
-    for (Eigen::Index i = 0; i <= N; i++) {
-        double Ri = 0;
-        for (std::size_t k = 0; k < system.mA(); k++) {
-            Ri += system.A()[k] * cheb(-2.0 * system.hA()[k] / tau_m + 1.0, i);
-        }
-        Sigma(0, i) = Ri;
-    }
-
-    // Set-up Pi
-    Eigen::MatrixXd Pi = Eigen::MatrixXd::Zero(N + 1, N + 1);
-    Pi.row(0) = 4.0 / tau_m * Eigen::MatrixXd::Ones(1, N + 1);
-    for (Eigen::Index i = 1; i <= N; i++) {
-        Pi(i, i - 1) = 1.0 / static_cast<double>(i);
-        if (i < N) {
-            Pi(i, i + 1) = -1.0 / static_cast<double>(i);
-        }
-    }
-    Pi(1, 0) = 2.0;
-    Pi = tau_m / 4.0 * Pi;
+    auto [Sigma, Pi] = sparse_spectral_discretization(system, N);
 
     ges.compute(Sigma, Pi);
     std::vector<std::complex<double>> res;
