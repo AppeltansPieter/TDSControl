@@ -15,6 +15,7 @@ tds::tds(std::vector<Eigen::MatrixXd> A, std::vector<double> hA) : m_A(std::move
         std::ranges::adjacent_find(m_A, [](const Eigen::MatrixXd &m1,
                                            const Eigen::MatrixXd &m2) { return m1.rows() != m2.rows(); }) == m_A.end(),
         "Dimensions of the matrices in A do not match!");
+    // Test
 }
 
 } // namespace tds
