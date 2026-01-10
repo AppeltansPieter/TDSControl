@@ -7,6 +7,7 @@
 namespace tds {
 std::pair<Eigen::MatrixXd, Eigen::MatrixXd> sparse_spectral_discretization(const tds &system, const std::size_t N)
 {
+    // TODO: Examine effect of scaling largest delay to one and shifting origin with r?
     /* Based on Michiels, Wim, and Silviu-Iulian Niculescu,Stability, control, and computation for time-delay systems:
      * an eigenvalue-based approach. Society for Industrial and Applied Mathematics, 2014. Chapter 2.2, Computing all
      * characteristic roots in a right half plane.

@@ -14,8 +14,9 @@ project(
 
 include(FetchContent)
 
-set(TDS_CONTROL_HEADERS include/tdscontrol/tds.hpp include/tdscontrol/roots.hpp
-                        src/discretization/spectral.hpp)
+set(TDS_CONTROL_HEADERS
+    include/tdscontrol/tds.hpp include/tdscontrol/roots.hpp
+    src/newtons_method.hpp src/discretization/spectral.hpp)
 
 set(TDS_CONTROL_SRC src/tds.cpp src/roots.cpp src/discretization/spectral.cpp)
 
@@ -55,11 +56,14 @@ if(TDS_BUILD_TESTING)
   enable_testing()
   find_package(GTest REQUIRED)
 
+  add_subdirectory(TDSControl-examples)
+
   enable_sanitizers(tdscontrol)
   enable_warnings(tdscontrol)
   target_compile_definitions(tdscontrol PUBLIC TDS_TESTING)
 
   add_tdscontrol_test(test_roots "tests/test_roots.cpp")
+  add_tdscontrol_test(test_newton "tests/newtons_method.cpp")
   add_tdscontrol_test(test_sparse_spectral_discretization
                       "tests/sparse_spectral_discretization.cpp")
 endif()
