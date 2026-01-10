@@ -1,0 +1,3 @@
+[submodule "TDSControl-examples"]
+	path = TDSControl-examples
+	url = git@github.com:AppeltansPieter/TDSControl-examples.git

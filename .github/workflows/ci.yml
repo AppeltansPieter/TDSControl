@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          submodules: recursive
       - name: Install Eigen3
         uses: kupns-aka-kupa/setup-eigen3@v1
         with:
