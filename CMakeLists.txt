@@ -15,10 +15,22 @@ project(
 include(FetchContent)
 
 set(TDS_CONTROL_HEADERS
-    include/tdscontrol/tds.hpp include/tdscontrol/roots.hpp
-    src/newtons_method.hpp src/discretization/spectral.hpp)
+        include/tdscontrol/tds.hpp
+        include/tdscontrol/roots.hpp
+        src/newtons_method.hpp
+        src/discretization/spectral.hpp
+        src/compute_N_rhp.hpp
+        src/utils/ipow.hpp
+        src/utils/thomas_algorithm.hpp
+        src/utils/cubic_spline.hpp
+        src/utils/grid_iterator.hpp
+        tests/convert_reader_data.hpp)
 
-set(TDS_CONTROL_SRC src/tds.cpp src/roots.cpp src/discretization/spectral.cpp)
+set(TDS_CONTROL_SRC src/tds.cpp src/roots.cpp src/discretization/spectral.cpp
+        src/compute_N_rhp.cpp
+        src/utils/grid_iterator.cpp
+        src/utils/cubic_spline.cpp
+        src/utils/thomas_algorithm.cpp)
 
 find_package(Eigen3 QUIET NO_MODULE)
 if(NOT Eigen3_FOUND)
@@ -66,6 +78,9 @@ if(TDS_BUILD_TESTING)
   add_tdscontrol_test(test_newton "tests/newtons_method.cpp")
   add_tdscontrol_test(test_sparse_spectral_discretization
                       "tests/sparse_spectral_discretization.cpp")
+  add_tdscontrol_test(test_grid_iterator "tests/utils/grid_iterator.cpp")
+  add_tdscontrol_test(test_splines "tests/utils/cubic_spline.cpp")
+  add_tdscontrol_test(test_compute_N_rhp "tests/compute_N_rhp.cpp")
 endif()
 
 find_program(CLANG_FORMAT clang-format)
