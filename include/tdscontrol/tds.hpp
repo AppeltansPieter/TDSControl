@@ -3,6 +3,8 @@
 #include <vector>
 
 namespace tds {
+
+// TODO: deal with commensurate delays
 class tds {
   public:
     tds(std::vector<Eigen::MatrixXd> A, std::vector<double> hA);
