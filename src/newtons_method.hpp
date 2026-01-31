@@ -15,9 +15,9 @@ struct MaxIter {
 class NewtonsMethod {
   public:
     explicit NewtonsMethod(const Eigen::Index n) : m_fun(n), m_step(n), m_jacobian(n, n), m_qr(m_jacobian) {}
-    void operator()(Eigen::VectorXcd &x,
-                    const std::function<void(const Eigen::VectorXcd &, Eigen::VectorXcd &, Eigen::MatrixXcd &)> &f,
-                    const Tolerance tol = Tolerance(1e-10), const MaxIter max_iter = MaxIter(10))
+    double operator()(Eigen::VectorXcd &x,
+                      const std::function<void(const Eigen::VectorXcd &, Eigen::VectorXcd &, Eigen::MatrixXcd &)> &f,
+                      const Tolerance tol = Tolerance(1e-10), const MaxIter max_iter = MaxIter(10))
     {
 #ifdef TDS_TESTING
         m_residuals.clear();
@@ -46,6 +46,7 @@ class NewtonsMethod {
 #ifdef TDS_TESTING
         m_residuals.push_back(residual);
 #endif
+        return residual;
     }
 #ifdef TDS_TESTING
     const std::vector<double> &get_residuals() const
