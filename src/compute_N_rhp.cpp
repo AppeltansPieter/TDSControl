@@ -5,6 +5,7 @@
 #include "utils/ipow.hpp"
 
 #include <Eigen/Dense>
+#include <algorithm>
 #include <cmath>
 #include <complex>
 #include <ranges>
@@ -141,7 +142,7 @@ template <bool commensurate> std::size_t compute_N_rhp_impl(const tds &sys, cons
             }
         }
     }
-    return std::max(N1, N2);
+    return std::max({N1, N2, 5});
 }
 
 std::size_t compute_N_rhp(const tds &sys, const double r, const std::size_t p)
