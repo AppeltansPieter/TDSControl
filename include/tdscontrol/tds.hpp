@@ -22,6 +22,11 @@ class tds {
         return m_A.at(k);
     }
 
+    std::vector<double> &hA()
+    {
+        return m_hA;
+    }
+
     const std::vector<double> &hA() const
     {
         return m_hA;

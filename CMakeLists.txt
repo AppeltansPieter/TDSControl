@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 option(ENABLE_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 
-file(READ "${CMAKE_SOURCE_DIR}/VERSION" VERSION_CONTENTS)
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" VERSION_CONTENTS)
 string(REGEX MATCH "VERSION = \"([0-9]+\.[0-9]+\.[0-9])\"" _
              ${VERSION_CONTENTS})
 set(PROJECT_VERSION "${CMAKE_MATCH_1}")
@@ -52,6 +52,7 @@ add_library(tdscontrol STATIC ${TDS_CONTROL_HEADERS} ${TDS_CONTROL_SRC})
 set_property(TARGET tdscontrol PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_include_directories(tdscontrol PUBLIC include)
 target_link_libraries(tdscontrol PUBLIC Eigen3::Eigen)
+target_compile_features(tdscontrol PRIVATE cxx_std_20)
 
 if(BUILD_EXAMPLES)
   add_executable(demo examples/demo.cpp)
