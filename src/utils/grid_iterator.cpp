@@ -1,6 +1,5 @@
 #include "grid_iterator.hpp"
 
-#include <bits/ios_base.h>
 #include <filesystem>
 
 namespace tds::utils {

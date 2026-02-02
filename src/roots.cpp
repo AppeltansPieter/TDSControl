@@ -43,7 +43,7 @@ std::vector<std::complex<double>> roots(const tds &system, const double r)
 {
     std::size_t N = compute_N_rhp(system, r);
     // TODO: make max size eigenvalue problem configurable
-    N = std::min(N, 100UL);
+    N = std::min(N, static_cast<std::size_t>(100));
     Eigen::GeneralizedEigenSolver<Eigen::MatrixXd> ges;
 
     auto [Sigma, Pi] = sparse_spectral_discretization(system, N);
