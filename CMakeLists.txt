@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 option(ENABLE_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
+option(TDS_ENABLE_COVERAGE "Enable coverage reporting" OFF)
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" VERSION_CONTENTS)
 string(REGEX MATCH "VERSION = \"([0-9]+\.[0-9]+\.[0-9])\"" _
@@ -11,6 +12,14 @@ project(
   tds-control
   VERSION ${PROJECT_VERSION}
   LANGUAGES C CXX)
+
+if(TDS_ENABLE_COVERAGE)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+        message(STATUS "Coverage enabled")
+        add_compile_options(-O0 -g --coverage)
+        add_link_options(--coverage)
+    endif()
+endif()
 
 include(FetchContent)
 
@@ -108,4 +117,34 @@ if(CMAKE_CXX_CLANG_TIDY)
     tidy
     COMMAND run-clang-tidy -p ${CMAKE_BINARY_DIR}
     COMMENT "Running clang-tidy on the entire project")
+endif()
+
+if(TDS_ENABLE_COVERAGE)
+    find_program(GCOVR gcovr)
+    if(GCOVR)
+        add_custom_target(coverage_html
+            COMMAND ${GCOVR} --root ${CMAKE_SOURCE_DIR}
+                             --filter 'src/.*' --filter 'include/.*'
+                             --html --html-details -o ${CMAKE_CURRENT_BINARY_DIR}/coverage.html
+                             --object-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles
+                             --exclude-throw-branches
+                             --exclude-unreachable-branches
+                             --exclude-function-lines
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMENT "Generating coverage report..."
+        )
+        add_custom_target(coverage_json
+            COMMAND ${GCOVR} -r ${CMAKE_SOURCE_DIR}
+                             --filter 'src/.*' --filter 'include/.*'
+                             --object-directory ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles
+                             --exclude-throw-branches
+                             --exclude-unreachable-branches
+                             --exclude-function-lines
+                             --json -o ${CMAKE_CURRENT_BINARY_DIR}/coverage.json
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMENT "Generating coverage report..."
+        )
+    else()
+        message(STATUS "Gcovr not found!")
+    endif()
 endif()
