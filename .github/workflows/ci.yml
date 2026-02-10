@@ -42,3 +42,8 @@ jobs:
           cmake --build --preset build-ci
       - name: Run tests
         run: ctest --preset test-ci
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          gcov_include: src/.* include/.*

@@ -24,7 +24,7 @@ GTEST_TEST(roots, two_dimensional)
     auto A1 = Eigen::MatrixXd(2, 2);
     A1 << -1., 1., 6., -7.;
     const tds::tds sys({A0, A1}, {0., 3.});
-    const auto roots = tds::roots(sys, -0.5);
+    const auto roots = tds::roots(sys, -0.1);
     Eigen::MatrixXcd M(2, 2);
     Eigen::JacobiSVD<Eigen::MatrixXcd> svd(2, 2);
     for (const auto root : roots) {

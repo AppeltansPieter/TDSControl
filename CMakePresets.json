@@ -28,8 +28,18 @@
       }
     },
     {
+      "name": "coverage",
+      "inherits": "debug",
+      "displayName": "Debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "TDS_BUILD_TESTING": "ON",
+        "TDS_ENABLE_COVERAGE": "ON"
+      }
+    },
+    {
         "name": "ci",
-        "inherits": "debug",
+        "inherits": "coverage",
         "cacheVariables": {
             "ENABLE_WARNINGS_AS_ERRORS": "ON"
         }
@@ -42,7 +52,6 @@
         "CMAKE_BUILD_TYPE": "Release"
       }
     },
-
     {
       "name": "relwithdebinfo",
       "inherits": "base",
@@ -57,6 +66,10 @@
     {
       "name": "build-debug",
       "configurePreset": "debug"
+    },
+    {
+      "name": "build-coverage",
+      "configurePreset": "coverage"
     },
     {
       "name": "build-release",
@@ -76,6 +89,13 @@
     {
       "name": "test-debug",
       "configurePreset": "debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "test-coverage",
+      "configurePreset": "coverage",
       "output": {
         "outputOnFailure": true
       }
