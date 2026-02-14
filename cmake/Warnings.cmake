@@ -3,7 +3,7 @@ function(enable_warnings target)
 
     target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic)
 
-    if(ENABLE_WARNINGS_AS_ERRORS)
+    if(TDS_ENABLE_WARNINGS_AS_ERRORS)
       target_compile_options(${target} PRIVATE -Werror)
     endif()
 
@@ -11,7 +11,7 @@ function(enable_warnings target)
 
     target_compile_options(${target} PRIVATE /W4 /permissive-)
 
-    if(ENABLE_WARNINGS_AS_ERRORS)
+    if(TDS_ENABLE_WARNINGS_AS_ERRORS)
       target_compile_options(${target} PRIVATE /WX)
     endif()
 
