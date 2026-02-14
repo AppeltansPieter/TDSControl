@@ -24,7 +24,8 @@
       "displayName": "Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "TDS_BUILD_TESTING": "ON"
+        "TDS_BUILD_TESTING": "ON",
+        "TDS_ENABLE_WARNINGS_AS_ERRORS": "ON"
       }
     },
     {
@@ -41,7 +42,6 @@
         "name": "ci",
         "inherits": "coverage",
         "cacheVariables": {
-            "ENABLE_WARNINGS_AS_ERRORS": "ON"
         }
     },
     {

@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.16.0)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-option(ENABLE_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 option(TDS_ENABLE_COVERAGE "Enable coverage reporting" OFF)
+option(TDS_ENABLE_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
+option(TDS_BUILD_TESTING "Build the tests" OFF)
+option(TDS_BUILD_EXAMPLES "Build the examples" OFF)
 
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" VERSION_CONTENTS)
 string(REGEX MATCH "VERSION = \"([0-9]+\.[0-9]+\.[0-9])\"" _
@@ -59,43 +61,64 @@ endif()
 
 add_library(tdscontrol STATIC ${TDS_CONTROL_HEADERS} ${TDS_CONTROL_SRC})
 set_property(TARGET tdscontrol PROPERTY POSITION_INDEPENDENT_CODE ON)
-target_include_directories(tdscontrol PUBLIC include)
+target_include_directories(tdscontrol PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
 target_link_libraries(tdscontrol PUBLIC Eigen3::Eigen)
 target_compile_features(tdscontrol PRIVATE cxx_std_20)
+add_library(TDSControl::tdscontrol ALIAS tdscontrol)
 
-if(BUILD_EXAMPLES)
-  add_executable(demo examples/demo.cpp)
-  target_link_libraries(demo tdscontrol)
+if(TDS_BUILD_EXAMPLES)
+  add_subdirectory(examples)
 endif()
 
 if(TDS_BUILD_TESTING)
-  message(STATUS "Build tests")
-  include(CTest)
-  include(Sanitizers)
-  include(Warnings)
-  include(AddTest)
-
-  enable_testing()
-  find_package(GTest REQUIRED)
-
   add_subdirectory(TDSControl-examples)
-
-  enable_sanitizers(tdscontrol)
-  enable_warnings(tdscontrol)
-  target_compile_definitions(tdscontrol PUBLIC TDS_TESTING)
-
-  add_tdscontrol_test(test_roots "tests/test_roots.cpp")
-  add_tdscontrol_test(test_newton "tests/newtons_method.cpp")
-  add_tdscontrol_test(test_sparse_spectral_discretization
-                      "tests/sparse_spectral_discretization.cpp")
-  add_tdscontrol_test(test_grid_iterator "tests/utils/grid_iterator.cpp")
-  add_tdscontrol_test(test_splines "tests/utils/cubic_spline.cpp")
-  add_tdscontrol_test(test_compute_N_rhp "tests/compute_N_rhp.cpp")
+  add_subdirectory(tests)
 endif()
+
+## Installation
+include(GNUInstallDirs)
+### Install the tdscontrol static library
+install(TARGETS tdscontrol
+        EXPORT TDSControlTargets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+### Install the header files
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+### Generate TDSControlTargets.cmake file and install it.
+install(
+  EXPORT TDSControlTargets
+  FILE
+    TDSControlTargets.cmake
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/TDSControl
+  NAMESPACE TDSControl::
+)
+
+### Create TDSControlConfig.cmake and TDSControlVersion.cmake and install these
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/TDSControlConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/TDSControlConfig.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/TDSControl"
+  NO_SET_AND_CHECK_MACRO
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO
+  )
+
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/TDSControlConfigVersion.cmake
+        VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMinorVersion)
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/TDSControlConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/TDSControlConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/TDSControl
+)
 
 find_program(CLANG_FORMAT clang-format)
 if(CLANG_FORMAT)
-  # TODO: make sure that this also catches new files!
   file(
     GLOB_RECURSE
     ALL_CXX_SOURCE_FILES
